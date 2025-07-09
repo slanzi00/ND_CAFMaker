@@ -130,23 +130,19 @@ namespace cafmaker
   }
 
 
-  void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt,
-                                                    int int_id) const
+  void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt, int int_id) const
   {
     LOG.DEBUG() << "    now copying truth info from Mnv TrueInteraction to SRTrueInteraction...\n";
 
     const auto NaN = std::numeric_limits<float>::signaling_NaN();
 
-    // here we are converting from mm (units from MINERvA) to cm
+    // here we are converting from mm (units from MINERvA) to cm // code copied from MINERvA version
     ValidateOrCopy(mc_int_vtx[int_id][0]/10., srTrueInt.vtx.x, NaN, "SRTrueInteraction::vtx::x");
     ValidateOrCopy(mc_int_vtx[int_id][1]/10., srTrueInt.vtx.y, NaN, "SRTrueInteraction::vtx::y");
     ValidateOrCopy(mc_int_vtx[int_id][2]/10., srTrueInt.vtx.z, NaN, "SRTrueInteraction::vtx::z");
-
-
   }
 
-  void TMSRecoBranchFiller::FillTrueParticle(caf::SRTrueParticle & srTruePart,
-                                                 int max_trkid) const
+  void TMSRecoBranchFiller::FillTrueParticle(caf::SRTrueParticle & srTruePart, int max_trkid) const
   {
     const auto NaN = std::numeric_limits<float>::signaling_NaN();
     ValidateOrCopy(mc_traj_pdg[max_trkid], srTruePart.pdg, 0, "pdg_code");
