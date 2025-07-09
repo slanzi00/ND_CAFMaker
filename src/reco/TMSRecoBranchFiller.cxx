@@ -130,6 +130,49 @@ namespace cafmaker
   }
 
 
+  void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt,
+                                                    int int_id) const
+  {
+    LOG.DEBUG() << "    now copying truth info from Mnv TrueInteraction to SRTrueInteraction...\n";
+
+    const auto NaN = std::numeric_limits<float>::signaling_NaN();
+
+    // here we are converting from mm (units from MINERvA) to cm
+    ValidateOrCopy(mc_int_vtx[int_id][0]/10., srTrueInt.vtx.x, NaN, "SRTrueInteraction::vtx::x");
+    ValidateOrCopy(mc_int_vtx[int_id][1]/10., srTrueInt.vtx.y, NaN, "SRTrueInteraction::vtx::y");
+    ValidateOrCopy(mc_int_vtx[int_id][2]/10., srTrueInt.vtx.z, NaN, "SRTrueInteraction::vtx::z");
+
+
+  }
+
+  void TMSRecoBranchFiller::FillTrueParticle(caf::SRTrueParticle & srTruePart,
+                                                 int max_trkid) const
+  {
+    const auto NaN = std::numeric_limits<float>::signaling_NaN();
+    ValidateOrCopy(mc_traj_pdg[max_trkid], srTruePart.pdg, 0, "pdg_code");
+
+    ValidateOrCopy(mc_traj_edepsim_trkid[max_trkid], srTruePart.G4ID, -1, "SRTrueParticle::track_id");
+    ValidateOrCopy(mc_traj_parentid[max_trkid], srTruePart.parent, -1, "SRTrueParticle::parent");
+    ValidateOrCopy(mc_traj_point_px[max_trkid][0]/1000., srTruePart.p.px, NaN, "SRTrueParticle::p.px");
+    ValidateOrCopy(mc_traj_point_py[max_trkid][0]/1000., srTruePart.p.py, NaN, "SRTrueParticle::p.py");
+    ValidateOrCopy(mc_traj_point_pz[max_trkid][0]/1000., srTruePart.p.pz, NaN, "SRTrueParticle::p.pz");
+
+    try
+    {
+      ValidateOrCopy(mc_traj_point_E[max_trkid][0] / 1000., srTruePart.p.E, NaN, "SRTrueParticle::p.E");
+    }
+    catch (std::runtime_error & e)
+    {
+      auto diff = (mc_traj_point_E[max_trkid][0] / 1000. - srTruePart.p.E);
+      if (diff < 1) // < 1 MeV
+      {
+      LOG.WARNING() << "True particle energy (track id=" << srTruePart.G4ID << ", pdg=" << srTruePart.pdg << ", stored E=" << srTruePart.p.E << ")"
+                      << " differs by " << diff << " MeV between stored (GENIE?) and ML-reco pass-through values";
+      }
+      else
+        throw e;
+    }
+  }
 
   std::deque<Trigger> TMSRecoBranchFiller::GetTriggers(int triggerType, bool beamOnly) const
   {

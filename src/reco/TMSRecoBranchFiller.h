@@ -40,6 +40,11 @@ namespace cafmaker
                              const cafmaker::Params &par,
                              const TruthMatcher *truthMatcher) const override;
 
+      void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt,
+                                                    int int_id) const;
+      void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt,
+                                                    int int_id) const;
+
       TFile *fTMSRecoFile;
       TTree *TMSRecoTree;
 
