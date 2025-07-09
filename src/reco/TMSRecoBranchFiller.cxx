@@ -100,9 +100,9 @@ namespace cafmaker
 
     unsigned total = 0; // Total number of tracks in the interaction
     interaction.ntracks = 0;
+    TMSRecoTree->GetEntry(i); // Load each subsequent entry in the spill, start from original i
     while (_SpillNo == LastSpillNo && i < TMSRecoTree->GetEntries()) // while we're in the spill
     {
-      TMSRecoTree->GetEntry(i++); // Load each subsequent entry in the spill, start from original i
       if (_nTracks > 0)
       {
         total = interaction.tracks.size();
@@ -128,6 +128,8 @@ namespace cafmaker
           interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[total+j];
         }
       }
+
+      TMSRecoTree->GetEntry(++i); // Load each subsequent entry before loop test condition
     }
   }
 
