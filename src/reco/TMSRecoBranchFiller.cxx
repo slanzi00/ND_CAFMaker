@@ -98,32 +98,34 @@ namespace cafmaker
     sr.nd.tms.ixn.emplace_back();
     caf::SRTMSInt& interaction = sr.nd.tms.ixn.back();
 
+    unsigned total = 0; // Total number of tracks in the interaction
     interaction.ntracks = 0;
     while (_SpillNo == LastSpillNo && i < TMSRecoTree->GetEntries()) // while we're in the spill
     {
       TMSRecoTree->GetEntry(i++); // Load each subsequent entry in the spill, start from original i
       if (_nTracks > 0)
       {
+        total = interaction.tracks.size();
         interaction.tracks.resize(_nTracks + interaction.tracks.size());
         for (int j = 0; j < _nTracks; ++j) {
           interaction.ntracks++;
-          interaction.tracks[j].start   = caf::SRVector3D(_TrackStartPos[j][0]/10., _TrackStartPos[j][1]/10., _TrackStartPos[j][2]/10.);;
-          interaction.tracks[j].end     = caf::SRVector3D(_TrackEndPos[j][0]/10., _TrackEndPos[j][1]/10., _TrackEndPos[j][2]/10.);
-          interaction.tracks[j].dir     = caf::SRVector3D(_TrackStartDirection[j][0], _TrackStartDirection[j][1] , _TrackStartDirection[j][2]);
-          interaction.tracks[j].enddir  = caf::SRVector3D(_TrackEndDirection[j][0], _TrackEndDirection[j][1] , _TrackEndDirection[j][2]);
+          interaction.tracks[total+j].start   = caf::SRVector3D(_TrackStartPos[total+j][0]/10., _TrackStartPos[total+j][1]/10., _TrackStartPos[total+j][2]/10.);;
+          interaction.tracks[total+j].end     = caf::SRVector3D(_TrackEndPos[total+j][0]/10., _TrackEndPos[total+j][1]/10., _TrackEndPos[total+j][2]/10.);
+          interaction.tracks[total+j].dir     = caf::SRVector3D(_TrackStartDirection[total+j][0], _TrackStartDirection[total+j][1] , _TrackStartDirection[total+j][2]);
+          interaction.tracks[total+j].enddir  = caf::SRVector3D(_TrackEndDirection[total+j][0], _TrackEndDirection[total+j][1] , _TrackEndDirection[total+j][2]);
 
           // Calculate length by summing up the distances from the kalman reco positions
 //          double tmpLength_cm = 0.0;
 //          for (int k=0; k<_nHitsInTrack[j]-1; k++)
-//            tmpLength_cm += sqrt( pow(_TrackRecoHitPos[j][k][0] - _TrackRecoHitPos[j][k+1][0], 2)
-//                                + pow(_TrackRecoHitPos[j][k][1] - _TrackRecoHitPos[j][k+1][1], 2)
-//                                + pow(_TrackRecoHitPos[j][k][2] - _TrackRecoHitPos[j][k+1][2], 2) );
+//            tmpLength_cm += sqrt( pow(_TrackRecoHitPos[total+j][k][0] - _TrackRecoHitPos[total+j][k+1][0], 2)
+//                                + pow(_TrackRecoHitPos[total+j][k][1] - _TrackRecoHitPos[total+j][k+1][1], 2)
+//                                + pow(_TrackRecoHitPos[total+j][k][2] - _TrackRecoHitPos[total+j][k+1][2], 2) );
 
           // Track info
-          //interaction.tracks[j].len_cm    = tmpLength_cm; //trackVec->Mag();
-          interaction.tracks[j].len_gcm2  = (_TrackLength[j]>0.0) ? _TrackLength[j]/10. : 0.0; // idk why we have negatives
-          interaction.tracks[j].qual      = _Occupancy[j]; // TODO: Apparently this is a "track quality", nominally (hits in track)/(total hits)
-          interaction.tracks[j].Evis      = _TrackEnergyDeposit[j];
+          //interaction.tracks[total+j].len_cm    = tmpLength_cm; //trackVec->Mag();
+          interaction.tracks[total+j].len_gcm2  = (_TrackLength[total+j]>0.0) ? _TrackLength[total+j]/10. : 0.0; // idk why we have negatives
+          interaction.tracks[total+j].qual      = _Occupancy[total+j]; // TODO: Apparently this is a "track quality", nominally (hits in track)/(total hits)
+          interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[total+j];
         }
       }
     }
