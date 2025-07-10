@@ -42,6 +42,7 @@ namespace cafmaker
 
       void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt, int int_id) const;
       void TMSRecoBranchFiller::FillTrueParticle(caf::SRTrueParticle & srTruePart, int max_trkid) const;
+      void FillInteractions(const TruthMatcher * truthMatch, caf::StandardRecord &sr) const;
 
       TFile *fTMSRecoFile;
       TTree *TMSRecoTree;
