@@ -133,6 +133,25 @@ namespace cafmaker
     }
   }
 
+    void TMSRecoBranchFiller::FillInteractions(const TruthMatcher * truthMatch, caf::StandardRecord &sr) const
+    {
+      for (int i_int = 0; i_int<n_interactions; i_int++)
+      {
+        Long_t neutrino_event_id = mc_int_edepsimId[i_int];
+        caf::SRTrueInteraction & srTrueInt = truthMatch->GetTrueInteraction(sr, neutrino_event_id);
+        LOG.VERBOSE() << "    --> resulting SRTrueInteraction has the following particles in it:\n";
+            for (const caf::SRTrueParticle & part : srTrueInt.prim)
+              LOG.VERBOSE() << "    (prim) id = " << part.G4ID << " pdg = " << part.pdg << ", energy = " << part.p.E << "\n";
+            for (const caf::SRTrueParticle & part : srTrueInt.prefsi)
+              LOG.VERBOSE() << "    (prefsi) id = " << part.G4ID << " pdg = " << part.pdg << ", energy = " << part.p.E << "\n";
+            for (const caf::SRTrueParticle & part : srTrueInt.sec)
+              LOG.VERBOSE() << "    (sec) id = " << part.G4ID  << " pdg = " << part.pdg << ", energy = " << part.p.E << "\n";
+
+            // here we need to fill in any additional info
+            // that GENIE didn't know about: e.g., secondary particles made by GEANT4
+          FillTrueInteraction(srTrueInt, i_int);
+      }
+    }
 
   void TMSRecoBranchFiller::FillTrueInteraction(caf::SRTrueInteraction & srTrueInt, int int_id) const
   {
