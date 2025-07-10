@@ -1,18 +1,32 @@
 #include "NDCAFMaker.fcl"
-
 nd_cafmaker: @local::standard_nd_cafmaker
 
-#nd_cafmaker.CAFMakerSettings.InputGHEPFile: "/dune/data/users/jwolcott/nd/nd-lar-reco/cafmaker_input/neutrino.LArTMSProductionJun23withLArCV.99.ghep.root"
-#nd_cafmaker.CAFMakerSettings.OutputFile: "/dune/data/users/jwolcott/scratch/neutrino.LArTMSProductionJun23withLArCV.99.caf.root"
-#nd_cafmaker.CAFMakerSettings.NDLArRecoFile: "/dune/data/users/jwolcott/nd/nd-lar-reco/cafmaker_input/neutrino.LArTMSProductionJun23withLArCV.99.summary.h5"
+# Example CAF input with MicroProdN4p1
+# GHEP files are given for LAr fiducial and rock/antifiducial
+# Multiple GHEP files (10 each for fiducial/antifiducial in this example)
+#
+nd_cafmaker.CAFMakerSettings.GHEPFiles: [ "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024600.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024601.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024602.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024603.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024604.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024605.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024606.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024607.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024608.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.ndlarfid.0024609.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024600.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024601.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024602.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024603.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024604.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024605.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024606.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024607.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024608.GHEP.root",
+                                          "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-genie/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid/GHEP/0024000/0024600/MicroProdN4p1_NDComplex_FHC.genie.rockantindlarfid.0024609.GHEP.root"]
 
-# CWret test setup
-nd_cafmaker.CAFMakerSettings.InputGHEPFile: "/dune/data/users/cwret/tms/dune_nd_production_2022_v1/genie/00/neutrino.0_1649778420.ghep.root"
-#nd_cafmaker.CAFMakerSettings.NDLArRecoFile: "/dune/data/users/
-nd_cafmaker.CAFMakerSettings.TMSRecoFile: "/dune/app/users/cwret/SSRI/dune-ssri/neutrino.0_1649778420.edep_TMS_RecoCandidates_Hough_Cluster1.root"
-nd_cafmaker.CAFMakerSettings.OutputFile: "/dune/app/users/cwret/ND_CAFMaker/out_caf.root"
-
-# SAND test setup
-#nd_cafmaker.CAFMakerSettings.SANDRecoFile: "/pnfs/dune/scratch/users/mvicenzi/100k_FHC.0.fast-reco.root"
-#nd_cafmaker.CAFMakerSettings.InputGHEPFile: "/pnfs/dune/scratch/users/mvicenzi/100k_FHC.0.ghep.root"
-#nd_cafmaker.CAFMakerSettings.OutputFile: "/pnfs/dune/scratch/users/mvicenzi/test_SAND_CAF.root"
+nd_cafmaker.CAFMakerSettings.EdepsimFile: "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-spill-build/MicroProdN4p1_NDComplex_FHC.spill.full/EDEPSIM_SPILLS/0002000/0002400/MicroProdN4p1_NDComplex_FHC.spill.full.0002460.EDEPSIM_SPILLS.root"
+nd_cafmaker.CAFMakerSettings.NDLArRecoFile: "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-mlreco/MicroProdN4p1_NDComplex_FHC.spine.full/MLRECO_SPINE/0002000/0002400/MicroProdN4p1_NDComplex_FHC.spine.full.0002460.MLRECO_SPINE.hdf5"
+nd_cafmaker.CAFMakerSettings.TMSRecoFile:   "/pnfs/dune/persistent/physicsgroups/dunendsim/abooth/nd-production/MicroProdN4p1/run-tms-reco/MicroProdN4p1_NDComplex_FHC.tmsreco.full/TMSRECO/0002000/0002400/MicroProdN4p1_NDComplex_FHC.tmsreco.full.0002460.TMSRECO.root"
+nd_cafmaker.CAFMakerSettings.OutputFile:    "example-CAF.root"
