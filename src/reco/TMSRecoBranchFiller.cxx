@@ -105,7 +105,8 @@ namespace cafmaker
     {
       if (_nTracks > 0)
       {
-        total += interaction.tracks.size();
+        total = interaction.tracks.size() + _nTracks;
+        std::cout << "total: " << total << std::endl;
         interaction.tracks.resize(_nTracks + interaction.tracks.size());
         for (int j = 0; j < _nTracks; ++j) {
           interaction.ntracks++;
