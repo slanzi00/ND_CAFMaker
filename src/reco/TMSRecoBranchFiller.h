@@ -95,6 +95,7 @@ namespace cafmaker
 
       Double_t        mc_int_vtx[200][4];   //[n_interactions]
       Long64_t        mc_int_edepsimId[200];   //[n_interactions]
+      int             n_interactions;
 
       bool is_data;
       mutable std::vector<cafmaker::Trigger> fTriggers;
