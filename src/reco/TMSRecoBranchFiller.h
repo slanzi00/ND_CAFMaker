@@ -74,6 +74,27 @@ namespace cafmaker
       float _TrackHitPos[100][200][4];
       float _TrackRecoHitPos[100][200][4];
 
+      //Trajectories (Truth variables)
+      Int_t           n_mc_trajectories;
+      Int_t           mc_traj_trkid[10000];   //[n_mc_trajectories]
+      Int_t           mc_traj_parentid[10000];   //[n_mc_trajectories]
+      Int_t           mc_traj_pdg[10000];   //[n_mc_trajectories]
+      Double_t        mc_traj_hit_e[10000];   //[n_mc_trajectories]
+      Int_t           mc_traj_npoints[10000];   //[n_mc_trajectories]
+      Int_t           mc_traj_edepsim_trkid[10000];   //[n_mc_trajectories]
+      Long64_t        mc_traj_edepsim_eventid[10000];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_x[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_y[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_z[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_t[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_px[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_py[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_pz[10000][5];   //[n_mc_trajectories]
+      Double_t        mc_traj_point_E[10000][5];   //[n_mc_trajectories]
+
+      Double_t        mc_int_vtx[200][4];   //[n_interactions]
+      Long64_t        mc_int_edepsimId[200];   //[n_interactions]
+
       bool is_data;
       mutable std::vector<cafmaker::Trigger> fTriggers;
       mutable decltype(fTriggers)::const_iterator  fLastTriggerReqd;    ///< the last trigger requested using _FillRecoBranches()
