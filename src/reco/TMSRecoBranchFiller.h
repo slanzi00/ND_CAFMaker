@@ -41,7 +41,7 @@ namespace cafmaker
                              const TruthMatcher *truthMatcher) const override;
 
       void FillTrueInteraction(caf::SRTrueInteraction & srTrueInt, int int_id) const;
-      void FillTrueParticle(caf::SRTrueParticle & srTruePart, int max_trkid) const;
+      void FillTrueParticle(caf::SRTrueParticle & srTruePart, int trkid) const;
       void FillInteractions(const TruthMatcher * truthMatch, caf::StandardRecord &sr) const;
 
       TFile *fTMSRecoFile;
