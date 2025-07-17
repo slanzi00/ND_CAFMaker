@@ -105,22 +105,14 @@ namespace cafmaker
     {
       if (_nTracks > 0)
       {
-        std::cout << "Tracks in spill " << _SpillNo << " with entry " << i << ", ntracks = " << _nTracks << std::endl;
         total = interaction.tracks.size();
-        //std::cout << "total: " << total  << "\t nTracks: " << _nTracks << std::endl;
         interaction.tracks.resize(_nTracks + interaction.tracks.size());
-        //std::cout << "tracksize: " << interaction.tracks.size() << std::endl;
         for (int j = 0; j < _nTracks; ++j) {
-          std::cout << "  Track " << j << " of " << _nTracks - 1 << std::endl;
           interaction.ntracks++;
           interaction.tracks[total+j].start   = caf::SRVector3D(_TrackStartPos[j][0]/10., _TrackStartPos[j][1]/10., _TrackStartPos[j][2]/10.);;
-          std:: cout << "    start  " << interaction.tracks[total+j].start << std::endl;//   = caf::SRVector3D(_TrackStartPos[total+j][0]/10., _TrackStartPos[total+j][1]/10., _TrackStartPos[total+j][2]/10.);;
           interaction.tracks[total+j].end     = caf::SRVector3D(_TrackEndPos[j][0]/10., _TrackEndPos[j][1]/10., _TrackEndPos[j][2]/10.);
-          std:: cout << "    end    " << interaction.tracks[total+j].end << std::endl;//   = caf::SRVector3D(_TrackStartPos[total+j][0]/10., _TrackStartPos[total+j][1]/10., _TrackStartPos[total+j][2]/10.);;
           interaction.tracks[total+j].dir     = caf::SRVector3D(_TrackStartDirection[j][0], _TrackStartDirection[j][1] , _TrackStartDirection[j][2]);
-          std:: cout << "    dir    " << interaction.tracks[total+j].dir<< std::endl;//   = caf::SRVector3D(_TrackStartPos[total+j][0]/10., _TrackStartPos[total+j][1]/10., _TrackStartPos[total+j][2]/10.);;
           interaction.tracks[total+j].enddir  = caf::SRVector3D(_TrackEndDirection[j][0], _TrackEndDirection[j][1] , _TrackEndDirection[j][2]);
-          std:: cout << "    enddir " << interaction.tracks[total+j].enddir<< std::endl;//   = caf::SRVector3D(_TrackStartPos[total+j][0]/10., _TrackStartPos[total+j][1]/10., _TrackStartPos[total+j][2]/10.);;
 
           // Calculate length by summing up the distances from the kalman reco positions
 //          double tmpLength_cm = 0.0;
@@ -135,9 +127,7 @@ namespace cafmaker
           interaction.tracks[total+j].qual      = _Occupancy[j]; // TODO: Apparently this is a "track quality", nominally (hits in track)/(total hits)
           interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[j];
         }
-          //std::cout << std::endl;
       }
-      else std::cout << "No track in spill " << _SpillNo << " with entry " << i << std::endl;
 
       TMSRecoTree->GetEntry(++i); // Load each subsequent entry before loop test condition
     }
