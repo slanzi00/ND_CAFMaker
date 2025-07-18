@@ -43,20 +43,22 @@ namespace cafmaker
       void FillTrueInteraction(caf::SRTrueInteraction & srTrueInt, int int_id) const;
       void FillTrueParticle(caf::SRTrueParticle & srTruePart, int trkid) const;
       void FillInteractions(const TruthMatcher * truthMatch, caf::StandardRecord &sr) const;
+      void FindTruthTrack(caf::StandardRecord &sr, caf::SRTrack &t, int track_id, const TruthMatcher *truthMatch) const;
 
       TFile *fTMSRecoFile;
       TTree *TMSRecoTree;
+      TTree *TMSTrueTree;
 
       // Save the branches that we're reading in
-      int _nLines;
-      int _EventNo;
-      int _SliceNo;
-      int _SpillNo;
-
-      int _nTracks;
-      int _nHitsInTrack[10];
+      int   _RunNo;
+      int   _nLines;
+      int   _EventNo;
+      int   _SliceNo;
+      int   _SpillNo;
+      int   _nTracks;
+      int   _nHitsInTrack[10];
+      int   _TrackCharge[10];
       float _TrackLength[10];
-      int _TrackCharge[10];
       float _TrackMomentum[10];
       float _TrackTotalEnergy[10];
       float _TrackEnergyDeposit[10];
@@ -74,6 +76,11 @@ namespace cafmaker
       // [100][200][4] needs to match TMS reco output (check file if in doubt)
       float _TrackHitPos[100][200][4];
       float _TrackRecoHitPos[100][200][4];
+
+      // True particle idx for reco tracks
+      int _RecoTrueVtxId[10];  // Vertex
+      int _RecoTruePartId[10]; // Primary
+      int _RecoTruePartIdSec[10]; //Secondary 
 
       //Trajectories (Truth variables)
       Int_t           n_mc_trajectories;

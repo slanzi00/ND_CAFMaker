@@ -27,10 +27,18 @@ namespace cafmaker
         std::cerr << "Are you sure this is a TMS reco file?" << std::endl;
         throw;
       }
+      // Save pointer to truth tree
+      TMSTrueTree = dynamic_cast<TTree*>(fTMSRecoFile->Get("Truth_Info"));
+      if (!TMSTrueTree) {
+        std::cerr << "Did not find TMS true tree Truth_Info in input file " << tmsRecoFilename << std::endl;
+        std::cerr << "Are you sure this is a TMS reco file?" << std::endl;
+        throw;
+      }
 
       TMSRecoTree->SetBranchAddress("EventNo",               &_EventNo);
       TMSRecoTree->SetBranchAddress("SliceNo",               &_SliceNo);
       TMSRecoTree->SetBranchAddress("SpillNo",               &_SpillNo);
+      TMSRecoTree->SetBranchAddress("RunNo",                 &_RunNo);
       TMSRecoTree->SetBranchAddress("nTracks",               &_nTracks);
       TMSRecoTree->SetBranchAddress("nHits",                 _nHitsInTrack);
       TMSRecoTree->SetBranchAddress("Length",                _TrackLength);
@@ -46,6 +54,12 @@ namespace cafmaker
       TMSRecoTree->SetBranchAddress("EndPos",                _TrackEndPos);
       TMSRecoTree->SetBranchAddress("StartDirection",        _TrackStartDirection);
       TMSRecoTree->SetBranchAddress("EndDirection",          _TrackEndDirection);
+
+      // Add Truth tree for the index of the true primary particles
+      TMSTrueTree->SetBranchAddress("RecoTrackPrimaryParticleVtxId", _RecoTrueVtxId);
+      TMSTrueTree->SetBranchAddress("RecoTrackPrimaryParticleIndex", _RecoTruePartId);
+      TMSTrueTree->SetBranchAddress("RecoTrackSecondaryParticleIndex", _RecoTruePartIdSec);
+
     } else {
       fTMSRecoFile = NULL;
       TMSRecoTree  = NULL;
@@ -97,10 +111,14 @@ namespace cafmaker
 
     sr.nd.tms.ixn.emplace_back();
     caf::SRTMSInt& interaction = sr.nd.tms.ixn.back();
+    caf::TrueParticleID truePartID;
+    caf::SRTrueParticle *srTruePart;
+    caf::SRTrueInteraction *srTrueInt;
 
     unsigned total = 0; // Total number of tracks in the interaction
     interaction.ntracks = 0;
     TMSRecoTree->GetEntry(i); // Load each subsequent entry in the spill, start from original i
+    TMSTrueTree->GetEntry(i); // Keep Truth tree in sync with Reco
     while (_SpillNo == LastSpillNo && i < TMSRecoTree->GetEntries()) // while we're in the spill
     {
       if (_nTracks > 0)
@@ -126,13 +144,29 @@ namespace cafmaker
           interaction.tracks[total+j].len_gcm2  = (_TrackLength[j]>0.0) ? _TrackLength[j]/10. : 0.0; // idk why we have negatives
           interaction.tracks[total+j].qual      = _Occupancy[j]; // TODO: Apparently this is a "track quality", nominally (hits in track)/(total hits)
           interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[j];
+
+          // Fill Truth
+          std::cout <<" LIAM       RTPId: " << _RecoTruePartId[j] << " RunNo: " << _RunNo << " SpillNo: " << _SpillNo << " inpoot: " << (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]) << std::endl;
+          srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + 2000), true)); // Pointer to the object
+          //srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]), true)); // Pointer to the object
+          truePartID.ixn  = _RecoTrueVtxId[j];
+          //truePartID.type = is_primary ? caf::TrueParticleID::kPrimary : caf::TrueParticleID::kSecondary;
+          truePartID.type = caf::TrueParticleID::kPrimary;
+
+//          srTruePart = is_primary ? truthMatcher->GetTrueParticle(sr, srTrueInt, j, true, false)
+//                                  : truthMatcher->GetTrueParticle(sr, srTrueInt, j, false, true);
+          //srTruePart = &(truthMatcher->GetTrueParticle(sr, (unsigned long) (_RunNo*1E6 + 2000), j, true, false)); // Pointer to the object
+
+          interaction.tracks[total+j].truth.push_back(std::move(truePartID));
         }
       }
 
       TMSRecoTree->GetEntry(++i); // Load each subsequent entry before loop test condition
+      TMSTrueTree->GetEntry(  i); // Load each subsequent entry before loop test condition
     }
   }
 
+/*
     void TMSRecoBranchFiller::FillInteractions(const TruthMatcher * truthMatch, caf::StandardRecord &sr) const
     {
       for (int i_int = 0; i_int<n_interactions; i_int++)
@@ -208,6 +242,91 @@ namespace cafmaker
     ValidateOrCopy(mc_traj_point_py[trkid][0], srTruePart.p.py, NaN, "SRTrueParticle::end_pos.y");
     ValidateOrCopy(mc_traj_point_pz[trkid][0], srTruePart.p.pz, NaN, "SRTrueParticle::end_pos.z");
   }
+*/
+
+  /*
+  void TMSRecoBranchFiller::FindTruthTrack(caf::StandardRecord &sr, caf::SRTrack &t, int track_id, const TruthMatcher *truthMatch) const
+  {
+    //std::map<int, double> most_trkid;
+    //for (int j = 0; j<_TrackHitPos[track_id]; j++)
+    //{
+    //    //Get the cluster associated to the node
+    //    int id_cl = trk_node_cluster_idx[track_id][j];
+    //    
+    //    //Get the # of digits (hits) in the cluster
+    //    int clus_size = clus_id_size[id_cl];
+    //
+    //    for (int k = 0; k<clus_size; k++)
+    //    {
+    //        int id_hit = clus_id_hits_idx[id_cl][0];
+    //        int traj_id = mc_id_mchit_trkid[id_hit][0]; // Get the true trajectory associated to the hit
+    //        if (mc_id_mchit_dE[id_hit][0] > 0) 
+    //        {
+    //          most_trkid[traj_id] += mc_id_mchit_dE[id_hit][0]; // Looks for trajectory that contributed the most to the track 
+    //        }
+    //    }          
+   // }
+   
+    //double max_trkid_stat = 0;
+    //int max_trkid = 0;
+    //
+    //for (auto const& tkid : most_trkid) 
+    //{
+    //    if (tkid.second > max_trkid_stat) 
+    //    {
+    //        max_trkid_stat = tkid.second;
+    //        max_trkid = tkid.first; 
+    //    }
+    //}
+
+    //Once the true particle has been found, loop over the truthBranch to find the corresponding truth interraction
+    //if (max_trkid >= n_mc_trajectories) // We want to access a trajectory that was not stored, set particle to kUnknown, will not be able to match the true particle
+    //{
+    //  caf::TrueParticleID truePartID;
+    //  truePartID.ixn = -1; //Should be the default for a new TrueParticleID but wanna make sure of it
+    //  truePartID.type = caf::TrueParticleID::kUnknown;
+    //  truePartID.part = -1;
+    //  t.truth.push_back(std::move(truePartID));
+    //  return;
+    //}
+
+    //Long_t neutrino_event_id = mc_traj_edepsim_eventid[max_trkid];
+    //caf::SRTrueInteraction & srTrueInt = truthMatch->GetTrueInteraction(sr, neutrino_event_id, true);
+    //Find the position of the interaction corresponding to the track in the interaction vector
+
+    //RecoTrackPrimaryParticleIndex
+ 
+    std::cout << _RecoTruePartId[track_id] << std::endl;
+
+    //std::size_t truthVecIdx = std::distance(sr.mc.nu.begin(), std::find_if(sr.mc.nu.begin(), sr.mc.nu.end(), [neutrino_event_id](const caf::SRTrueInteraction& nu) { return nu.id == neutrino_event_id; } ));
+    //Int_t edepsim_track_id = mc_traj_edepsim_trkid[max_trkid];
+
+    //We don't store the status of the particle (primary or not) inside MNV reco, first look in the list of primaries ID if we're around
+    //std::size_t truthPartIdx = std::distance(srTrueInt.prim.begin(), std::find_if(srTrueInt.prim.begin(), srTrueInt.prim.end(), [edepsim_track_id](const caf::SRTrueParticle& part) { return part.G4ID == edepsim_track_id; }));
+    //bool is_primary = truthPartIdx != srTrueInt.prim.size();
+  
+//    caf::SRTrueParticle & srTruePart = is_primary ? truthMatch->GetTrueParticle(sr, srTrueInt, edepsim_track_id, true, false)
+//                                                    : truthMatch->GetTrueParticle(sr, srTrueInt, edepsim_track_id, false, true);
+    caf::SRTrueParticle & srTruePart = truthMatch->GetTrueParticle(sr, srTrueInt, track_id, true, false);
+
+
+    caf::TrueParticleID truePartID;
+    truePartID.ixn = truthVecIdx;
+    truePartID.type = is_primary ? caf::TrueParticleID::kPrimary
+                                 : caf::TrueParticleID::kSecondary;
+
+    FillTrueParticle(srTruePart,max_trkid);                                                                                                                                                  
+
+
+    if (truePartID.type == caf::TrueParticleID::kPrimary) truePartID.part = edepsim_track_id;
+    else
+    {
+      truePartID.part = std::distance(srTrueInt.sec.begin(), std::find_if(srTrueInt.sec.begin(), srTrueInt.sec.end(), [edepsim_track_id](const caf::SRTrueParticle& part) { return part.G4ID == edepsim_track_id; })); // we just filled it so it should be fine
+    }
+    t.truth.push_back(std::move(truePartID));
+
+  } // End FindTrueParticle
+*/
 
   std::deque<Trigger> TMSRecoBranchFiller::GetTriggers(int triggerType, bool beamOnly) const
   {
