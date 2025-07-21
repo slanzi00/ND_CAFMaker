@@ -40,11 +40,6 @@ namespace cafmaker
                              const cafmaker::Params &par,
                              const TruthMatcher *truthMatcher) const override;
 
-      void FillTrueInteraction(caf::SRTrueInteraction & srTrueInt, int int_id) const;
-      void FillTrueParticle(caf::SRTrueParticle & srTruePart, int trkid) const;
-      void FillInteractions(const TruthMatcher * truthMatch, caf::StandardRecord &sr) const;
-      void FindTruthTrack(caf::StandardRecord &sr, caf::SRTrack &t, int track_id, const TruthMatcher *truthMatch) const;
-
       TFile *fTMSRecoFile;
       TTree *TMSRecoTree;
       TTree *TMSTrueTree;
