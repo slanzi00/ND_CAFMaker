@@ -146,10 +146,10 @@ namespace cafmaker
           interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[j];
 
           // Fill Truth
-          std::cout <<" LIAM       RTPId: " << _RecoTruePartId[j] << " RunNo: " << _RunNo << " SpillNo: " << _SpillNo << " inpoot: " << (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]) << std::endl;
-          srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + 2000), true)); // Pointer to the object
-          //srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]), true)); // Pointer to the object
-          truePartID.ixn  = _RecoTrueVtxId[j];
+          //std::cout <<" LIAM       RTPId: " << _RecoTruePartId[j] << " RunNo: " << _RunNo << " SpillNo: " << _SpillNo << " inpoot: " << (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]) << std::endl;
+          //srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + 2000), true)); // Pointer to the object
+          srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]), true)); // Pointer to the object
+          truePartID.ixn  = (long int) (_RunNo*1E6 + _RecoTrueVtxId[j]);
           //truePartID.type = is_primary ? caf::TrueParticleID::kPrimary : caf::TrueParticleID::kSecondary;
           truePartID.type = caf::TrueParticleID::kPrimary;
 
@@ -352,7 +352,7 @@ namespace cafmaker
         Trigger & trig      = fTriggers.back(); // trigger we're working on
 
         trig.evtID = entry;
-        trig.triggerType = 0; //2147483647; // TODO real number?
+        trig.triggerType = 1; //2147483647; // TODO real number?
 
         if (entry == 0) // TODO do this less bad
           trig.triggerTime_ns = 0;
