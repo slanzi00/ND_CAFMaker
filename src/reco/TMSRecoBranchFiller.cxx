@@ -131,30 +131,19 @@ namespace cafmaker
           interaction.tracks[total+j].dir     = caf::SRVector3D(_TrackStartDirection[j][0], _TrackStartDirection[j][1] , _TrackStartDirection[j][2]);
           interaction.tracks[total+j].enddir  = caf::SRVector3D(_TrackEndDirection[j][0], _TrackEndDirection[j][1] , _TrackEndDirection[j][2]);
 
-          // Calculate length by summing up the distances from the kalman reco positions
-//          double tmpLength_cm = 0.0;
-//          for (int k=0; k<_nHitsInTrack[j]-1; k++)
-//            tmpLength_cm += sqrt( pow(_TrackRecoHitPos[total+j][k][0] - _TrackRecoHitPos[total+j][k+1][0], 2)
-//                                + pow(_TrackRecoHitPos[total+j][k][1] - _TrackRecoHitPos[total+j][k+1][1], 2)
-//                                + pow(_TrackRecoHitPos[total+j][k][2] - _TrackRecoHitPos[total+j][k+1][2], 2) );
-
           // Track info
-          //interaction.tracks[total+j].len_cm    = tmpLength_cm; //trackVec->Mag();
+          //interaction.tracks[total+j].len_cm    = tmpLength_cm; //trackVec->Mag(); // TODO: Coming Soon™
           interaction.tracks[total+j].len_gcm2  = (_TrackLength[j]>0.0) ? _TrackLength[j]/10. : 0.0; // idk why we have negatives
           interaction.tracks[total+j].qual      = _Occupancy[j]; // TODO: Apparently this is a "track quality", nominally (hits in track)/(total hits)
           interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[j];
 
           // Fill Truth
-          //std::cout <<" LIAM       RTPId: " << _RecoTruePartId[j] << " RunNo: " << _RunNo << " SpillNo: " << _SpillNo << " inpoot: " << (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]) << std::endl;
-          //srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + 2000), true)); // Pointer to the object
+          // TODO: (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]) ... what am I smoking.
+          // The run numbers in the GHEP(?) or edep files are of the run number, followed by the event number, so we recreate that. Long cos it's very long innit. Sorry.
           srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]), true)); // Pointer to the object
           truePartID.ixn  = (long int) (_RunNo*1E6 + _RecoTrueVtxId[j]);
-          //truePartID.type = is_primary ? caf::TrueParticleID::kPrimary : caf::TrueParticleID::kSecondary;
+          //truePartID.type = is_primary ? caf::TrueParticleID::kPrimary : caf::TrueParticleID::kSecondary; // TODO: Make TMS care about prim/sec tracks
           truePartID.type = caf::TrueParticleID::kPrimary;
-
-//          srTruePart = is_primary ? truthMatcher->GetTrueParticle(sr, srTrueInt, j, true, false)
-//                                  : truthMatcher->GetTrueParticle(sr, srTrueInt, j, false, true);
-          //srTruePart = &(truthMatcher->GetTrueParticle(sr, (unsigned long) (_RunNo*1E6 + 2000), j, true, false)); // Pointer to the object
 
           interaction.tracks[total+j].truth.push_back(std::move(truePartID));
         }
@@ -165,6 +154,7 @@ namespace cafmaker
     }
   }
 
+  // TODO: In future this nastiness will be handled by TMS
   std::deque<Trigger> TMSRecoBranchFiller::GetTriggers(int triggerType, bool beamOnly) const
   {
     std::deque<Trigger> triggers;
@@ -189,7 +179,7 @@ namespace cafmaker
         Trigger & trig      = fTriggers.back(); // trigger we're working on
 
         trig.evtID = entry;
-        trig.triggerType = 1; //2147483647; // TODO real number?
+        trig.triggerType = 1; // TODO real number?
 
         if (entry == 0) // TODO do this less bad
           trig.triggerTime_ns = 0;
