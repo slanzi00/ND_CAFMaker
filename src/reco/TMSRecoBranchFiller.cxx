@@ -62,7 +62,6 @@ namespace cafmaker
 
     } else {
       fTMSRecoFile = NULL;
-      TMSRecoTree  = NULL;
       std::cerr << "The TMS reco file you provided: " << tmsRecoFilename 
                 << " appears to be a Zombie 🧟" << std::endl;
       throw;
