@@ -159,7 +159,7 @@ namespace cafmaker
     std::vector<caf::SRNDTrackAssn> possibleSPINEMatches; // vector will store all possible matched tracks between SPINE and TMS
 
     double tms_z_cutoff = 20;
-    double lar_z_cutoff = 20; // tracks must overlap last/first 10 cm of the detectors
+    double lar_z_cutoff = 20; // tracks must overlap last/first 20 cm of the detectors
     //std::cout << "I'm running the matching code on " << sr.nd.tms.nixn << std::endl;
     for (unsigned int ixn_tms = 0; ixn_tms < sr.nd.tms.nixn; ixn_tms++)
     {
@@ -222,6 +222,7 @@ namespace cafmaker
             if (use_time) {
               std::vector<float> tO = pan_trk.truthOverlap;
               std::vector<caf::TrueParticleID> truIDs = pan_trk.truth;
+              std::cout << "truIDs Length: " << truIDs.size << std::endl;
               int idx_max = std::distance(tO.begin(),std::max_element(tO.begin(),tO.end()));
               caf::TrueParticleID partID = truIDs[idx_max];
               const auto& matchedPart = sr.mc.Particle(partID);
