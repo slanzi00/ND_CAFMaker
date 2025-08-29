@@ -58,6 +58,7 @@ namespace cafmaker
       double sigma_t;
       double f_cut;
 
+      // Dimensions of TMS and LAr fiducial volume [cm]
       double tms_x_lim1 = -352.0;
       double tms_x_lim2 = 352.0;
       double tms_y_lim1 = -386.4;

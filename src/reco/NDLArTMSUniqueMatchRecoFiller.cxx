@@ -91,12 +91,9 @@ namespace cafmaker
         double yz_dot_prod = yz_dot_prod/(sqrt(pow(tms_dir_y,2)+pow(tms_dir_z,2))*sqrt(pow(lar_dir_y,2)+pow(lar_dir_z,2)));
       }
       double dot_prod = tms_dir_x*lar_dir_x + tms_dir_y*lar_dir_y + tms_dir_z*lar_dir_z;
-      //std::cout << "Dot product: " << dot_prod << std::endl;
-      //std::cout << "Arccos: " << acos(dot_prod) << std::endl;
       double angle_x = 180.0/TMath::Pi() * acos(xz_dot_prod);
       double angle_y = 180.0/TMath::Pi() * acos(yz_dot_prod);
       double angle_overall = 180.0/TMath::Pi() * acos(dot_prod);
-      //std::cout << "Angle: " << angle_overall << std::endl;
       std::vector<double> angles = {angle_x,angle_y,angle_overall};
       return angles;
   }
@@ -160,7 +157,7 @@ namespace cafmaker
 
     double tms_z_cutoff = 20;
     double lar_z_cutoff = 20; // tracks must overlap last/first 20 cm of the detectors
-    //std::cout << "I'm running the matching code on " << sr.nd.tms.nixn << std::endl;
+    
     for (unsigned int ixn_tms = 0; ixn_tms < sr.nd.tms.nixn; ixn_tms++)
     {
       caf::SRTMSInt tms_int = sr.nd.tms.ixn[ixn_tms];
@@ -170,12 +167,9 @@ namespace cafmaker
       for (unsigned int itms = 0; itms < n_tms_tracks; itms++)
       {
         caf::SRTrack tms_trk = tms_int.tracks[itms];
-        //std::cout << "TMS Start X: " << tms_trk.start.x << " TMS Start Y: " << tms_trk.start.y << " TMS Start Z: " << tms_trk.start.z << std::endl;
         double tms_time = tms_trk.time;
-        //std::cout << "TMS Time: " << tms_time << std::endl;
 
         if (!Consider_TMS_track(tms_trk,tms_z_cutoff)) {
-          //std::cout << "Not considering this TMS track, skipping" << std::endl;
           continue; //skips the tms track if it isn't suitable according to the function
         }
 
@@ -187,11 +181,8 @@ namespace cafmaker
           for (unsigned int ipan = 0; ipan < n_pan_tracks; ipan++)
           {
             caf::SRTrack pan_trk = pan_int.tracks[ipan];
-            //std::cout << "Pandora Start X: " << pan_trk.start.x << " Pandora Start X Dir: " << pan_trk.dir.x<< std::endl;
-            
 
             if (!Consider_LAr_track(pan_trk,lar_z_cutoff)) {
-              //std::cout << "Not considering this LAr track, skipping" << std::endl;
               continue; //skips the lar track if it isn't suitable according to the function
             }
             
@@ -210,8 +201,6 @@ namespace cafmaker
 
             if (single_angle) {
               double angle = angles[2];
-
-              //std::cout << "angle: " << angle << std::endl;
               fScore = pow(delta_x/sigma_x,2) + pow(delta_y/sigma_y,2) + pow(angle/sigma_angle,2);
             }
             else {
@@ -222,21 +211,17 @@ namespace cafmaker
             if (use_time) {
               std::vector<float> tO = pan_trk.truthOverlap;
               std::vector<caf::TrueParticleID> truIDs = pan_trk.truth;
-              std::cout << "truIDs Length: " << truIDs.size << std::endl;
               int idx_max = std::distance(tO.begin(),std::max_element(tO.begin(),tO.end()));
               caf::TrueParticleID partID = truIDs[idx_max];
               const auto& matchedPart = sr.mc.Particle(partID);
               if (matchedPart != nullptr) {
                 lar_time = matchedPart->time - 1e9*trigger.triggerTime_s - trigger.triggerTime_ns;
                 start_pos = matchedPart->start_pos;
-                std::cout << "LAr time: " << lar_time << std::endl;
                 delta_t = lar_time - tms_time;
-                std::cout << "Delta t: " << delta_t << std::endl;
                 fScore += pow((delta_t-mean_t)/sigma_t,2);
               }
-              //else {std::cout << "Invalid particle ID, not using time in match score" << std::endl;}
             }
-            std::cout << "Match score = " << fScore << std::endl;
+
             caf::SRTMSID tmsid;
             tmsid.ixn = ixn_tms;
             tmsid.idx = itms;
@@ -268,28 +253,7 @@ namespace cafmaker
 
             joint_track.Evis = pan_trk.Evis + tms_trk.Evis;
             // TODO: add the rest of the joint_track attributes
-
-            //std::cout << "TMS ixn: " << potential_match.tmsid.ixn << " TMS trk: " << potential_match.tmsid.idx << std::endl;
-            std::cout << "LAr ixn: " << potential_match.larid.ixn << " LAr trk: " << potential_match.larid.idx << " LAr time: " << lar_time << std::endl;
-            //std::cout << "TMS start x: " << tms_trk.start.x << " TMS start y: " << tms_trk.start.y << " TMS start z: " << tms_trk.start.z << std::endl;
-            std::cout << "LAr start x: " << start_pos.x << " LAr start y: " << start_pos.y << " LAr start z: " << start_pos.z << std::endl;
-            //std::cout << "LAr x projection: " << proj_vec[0] << " Delta x: " << delta_x << std::endl;
-            //std::cout << "Sigma x: " << sigma_x << " X term: " << pow(delta_x/sigma_x,2) << std::endl;
-            //std::cout << "LAr y projection: " << proj_vec[1] << " Delta y: " << delta_y << std::endl;
-            //std::cout << "Sigma y: " << sigma_y << " Y term: " << pow(delta_y/sigma_y,2) << std::endl;
-            //std::cout << "Angle: " << angles[2] << " Sigma angle: " << sigma_angle << " Angle term: " << pow(angles[2]/sigma_angle,2) << std::endl;
-            if (use_time) {
-              //std::cout << "TMS time: " << tms_time << " LAr time: " << lar_time << " Delta t: " << delta_t << std::endl;
-              //std::cout << "Mean time: " << mean_t << "Sigma t: " << sigma_t << " T term: " << pow((delta_t-mean_t)/sigma_t,2) << std::endl;
-              //std::cout << "Sum: " << pow(delta_x/sigma_x,2)+pow(delta_y/sigma_y,2)+pow(angles[2]/sigma_angle,2)+pow((delta_t-mean_t)/sigma_t,2) << std::endl;
-            }
-            else {
-              //std::cout << "No time" << std::endl;
-              //std::cout << "Sum: " << pow(delta_x/sigma_x,2)+pow(delta_y/sigma_y,2)+pow(angles[2]/sigma_angle,2) << std::endl;
-            }
-            //std::cout << "Match score: " << potential_match.matchScore << std::endl;
-            std::cout << "----------------------------------------------------------------" << std::endl;
-
+            
             possiblePandoraMatches.push_back(potential_match);
           }
         }
@@ -338,8 +302,7 @@ namespace cafmaker
                 fScore += pow((delta_t-mean_t)/sigma_t,2);
               }
             }
-            //std::cout << "Match score = " << fScore << std::endl;
-            //std::cout << "fCut = " << f_cut << std::endl;
+
             caf::SRTMSID tmsid;
             tmsid.ixn = ixn_tms;
             tmsid.idx = itms;
@@ -387,43 +350,33 @@ namespace cafmaker
         caf::SRNDTrackAssn track_match = possiblePandoraMatches[match_idx];
         double score = track_match.matchScore;
         if (score > f_cut) {
-          //std::cout << "Match score " << score << " > cut " << f_cut << " so no match" << std::endl;
           break;}
         caf::SRNDLArID panid = track_match.larid;
         bool seen_lar = false;
         for (auto const seen_panid : matched_pan) {
           if (seen_panid.ixn == panid.ixn && seen_panid.idx == panid.idx) {
-            //std::cout << "This LAr track with ixn " << panid.ixn << " " << seen_panid.ixn << " and idx " << panid.idx << " " << seen_panid.idx << " has already been matched. Skipping." << std::endl;
             seen_lar = true;
             break;
           }
         }
         if (seen_lar) {
-          std::cout << "seen_lar = true" << std::endl;
           continue;}
         caf::SRTMSID tmsid = track_match.tmsid;
         bool seen_tms = false;
         for (auto const seen_tmsid : matched_tmspan) {
           if (seen_tmsid.ixn == tmsid.ixn && seen_tmsid.idx == tmsid.idx) {
-            //std::cout << "This TMS track with ixn " << tmsid.ixn << " " << seen_tmsid.ixn << " and idx " << tmsid.idx << " " << seen_tmsid.idx << " has already been matched. Skipping." << std::endl;
             seen_tms = true;
             break;
           }
         }
         if (seen_tms) {
-          //std::cout << "seen_tms = true" << std::endl;
           continue;}
         
         matched_tmspan.push_back(tmsid);
         matched_pan.push_back(panid);
         sr.nd.trkmatch.extrap.push_back(track_match);
-        //std::cout << "nextrap before " << sr.nd.trkmatch.nextrap << std::endl;
         sr.nd.trkmatch.nextrap += 1;
-        //std::cout << "nextrap after " << sr.nd.trkmatch.nextrap << std::endl;
       }
-    }
-    else {
-      //std::cout << "possiblePandoraMatches is empty. Did you expect that?\n";
     }
 
     if (possibleSPINEMatches.size() > 0) {
@@ -461,17 +414,11 @@ namespace cafmaker
         sr.nd.trkmatch.nextrap += 1;  
       }
     }
-    else {
-      //std::cout << "possibleSPINEMatches is empty. Did you expect that?\n";
-    }
-    //std::cout << "_FillRecoBranches completed\n";
   }
   // todo: this is a placeholder
   std::deque<Trigger> NDLArTMSUniqueMatchRecoFiller::GetTriggers(int triggerType, bool beamOnly) const
   {
-    std::cout << "Attempting GetTriggers\n";
     return std::deque<Trigger>();
-    std::cout << "Completed GetTriggers\n";
   }
 
 }
