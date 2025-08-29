@@ -204,7 +204,7 @@ namespace cafmaker
         Trigger & trig      = fTriggers.back(); // trigger we're working on
 
         trig.evtID = entry;
-        trig.triggerType = 0; // TODO real number?
+        trig.triggerType = 1; // TODO real number?
 
         if (entry == 0) // TODO do this less bad
           trig.triggerTime_ns = 0;
