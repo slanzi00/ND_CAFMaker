@@ -232,7 +232,7 @@ namespace cafmaker
 
             caf::SRNDTrackAssn potential_match;
             if (use_time) {
-              potential_match.matchType = caf::MatchType::kUniqueWithTime;
+              potential_match.matchType = caf::NDRecoMatchType::kUniqueWithTime;
             }
             else {
               potential_match.matchType = caf::MatchType::kUniqueNoTime;
