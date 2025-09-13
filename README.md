@@ -5,7 +5,7 @@
 The package has a number of dependencies, all accessible through the `ups` framework at Fermilab and github. 
 The first time you use it'll you'll need to build the dependencies.  Simply run
 ```
-./build.sh
+./build_deps.sh
 ```
 
 For subsequent use, 
