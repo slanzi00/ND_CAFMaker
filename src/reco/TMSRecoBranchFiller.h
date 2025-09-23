@@ -72,11 +72,11 @@ namespace cafmaker
       float _TrackHitPos[100][200][4];
       float _TrackRecoHitPos[100][200][4];
 
-            // True particle idx for reco tracks
+      // True particle idx for reco tracks
       int _RecoTrueVtxId[10];  // Vertex
       int _RecoTruePartId[10]; // Primary
-      int _RecoTruePartIdSec[10]; //Secondary
-      
+      int _RecoTruePartIdSec[10]; //Secondary 
+
       bool is_data;
       mutable std::vector<cafmaker::Trigger> fTriggers;
       mutable decltype(fTriggers)::const_iterator  fLastTriggerReqd;    ///< the last trigger requested using _FillRecoBranches()

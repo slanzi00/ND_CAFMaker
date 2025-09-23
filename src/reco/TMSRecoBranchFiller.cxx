@@ -28,12 +28,13 @@ namespace cafmaker
         std::cerr << "Are you sure this is a TMS reco file?" << std::endl;
         throw;
       }
+
       if (!TMSLCTree) {
         std::cerr << "Did not find TMS reco tree Line_Candidates in input file " << tmsRecoFilename << std::endl;
         std::cerr << "Are you sure this is a TMS reco file?" << std::endl;
         throw;
       }
-            // Save pointer to truth tree
+      // Save pointer to truth tree
       TMSTrueTree = dynamic_cast<TTree*>(fTMSRecoFile->Get("Truth_Info"));
       if (!TMSTrueTree) {
         std::cerr << "Did not find TMS true tree Truth_Info in input file " << tmsRecoFilename << std::endl;
@@ -60,7 +61,6 @@ namespace cafmaker
       TMSRecoTree->SetBranchAddress("EndPos",                _TrackEndPos);
       TMSRecoTree->SetBranchAddress("StartDirection",        _TrackStartDirection);
       TMSRecoTree->SetBranchAddress("EndDirection",          _TrackEndDirection);
-
       TMSLCTree->SetBranchAddress("TMSStartTime",            &_TMSStartTime);
     // Add Truth tree for the index of the true primary particles
       TMSTrueTree->SetBranchAddress("RecoTrackPrimaryParticleVtxId", _RecoTrueVtxId);
@@ -122,11 +122,12 @@ namespace cafmaker
 
     sr.nd.tms.ixn.emplace_back();
     caf::SRTMSInt& interaction = sr.nd.tms.ixn.back();
+
     sr.nd.tms.nixn += 1; //Make sure to update nixn
     caf::TrueParticleID truePartID;
     caf::SRTrueParticle *srTruePart;
-    //caf::SRTrueInteraction *srTrueInt;
-    
+    caf::SRTrueInteraction *srTrueInt;
+
     unsigned total = 0; // Total number of tracks in the interaction
     interaction.ntracks = 0;
     TMSRecoTree->GetEntry(i); // Load each subsequent entry in the spill, start from original i
@@ -136,6 +137,7 @@ namespace cafmaker
     {
       if (_nTracks > 0)
       {        
+
         total = interaction.tracks.size();
         interaction.tracks.resize(_nTracks + interaction.tracks.size());
         for (int j = 0; j < _nTracks; ++j) {
@@ -144,19 +146,11 @@ namespace cafmaker
           interaction.tracks[total+j].end     = caf::SRVector3D(_TrackEndPos[j][0]/10., _TrackEndPos[j][1]/10., _TrackEndPos[j][2]/10.);
           interaction.tracks[total+j].dir     = caf::SRVector3D(_TrackStartDirection[j][0], _TrackStartDirection[j][1] , _TrackStartDirection[j][2]);
           interaction.tracks[total+j].enddir  = caf::SRVector3D(_TrackEndDirection[j][0], _TrackEndDirection[j][1] , _TrackEndDirection[j][2]);
+
           interaction.tracks[total+j].time    = _TMSStartTime; //Adds time of interaction
-          // The above argument used to be j before the GetEntry(i++) stuff got commented out
-          //std::cout << "2nd TMS time " << interaction.tracks[j].time << std::endl;
-        
-          // Calculate length by summing up the distances from the kalman reco positions
-//          double tmpLength_cm = 0.0;
-//          for (int k=0; k<_nHitsInTrack[j]-1; k++)
-//            tmpLength_cm += sqrt( pow(_TrackRecoHitPos[j][k][0] - _TrackRecoHitPos[j][k+1][0], 2)
-//                                + pow(_TrackRecoHitPos[j][k][1] - _TrackRecoHitPos[j][k+1][1], 2)
-//                                + pow(_TrackRecoHitPos[j][k][2] - _TrackRecoHitPos[j][k+1][2], 2) );
 
           // Track info
-          //interaction.tracks[total+j].len_cm    = tmpLength_cm; //trackVec->Mag();
+          //interaction.tracks[total+j].len_cm    = tmpLength_cm; //trackVec->Mag(); // TODO: Coming Soon™
           interaction.tracks[total+j].len_gcm2  = (_TrackLength[j]>0.0) ? _TrackLength[j]/10. : 0.0; // idk why we have negatives
           interaction.tracks[total+j].qual      = _Occupancy[j]; // TODO: Apparently this is a "track quality", nominally (hits in track)/(total hits)
           interaction.tracks[total+j].Evis      = _TrackEnergyDeposit[j];
@@ -164,6 +158,8 @@ namespace cafmaker
           // Fill Truth
           // TODO: (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]) ... what am I smoking.
           // The run numbers in the GHEP(?) or edep files are of the run number, followed by the event number, so we recreate that. Long cos it's very long innit. Sorry.
+
+          srTrueInt = &(truthMatcher->GetTrueInteraction(sr, (unsigned long) (_RunNo*1E6 + _RecoTruePartId[j]), true)); // Pointer to the object
           truePartID.ixn  = (long int) (_RunNo*1E6 + _RecoTrueVtxId[j]);
           //truePartID.type = is_primary ? caf::TrueParticleID::kPrimary : caf::TrueParticleID::kSecondary; // TODO: Make TMS care about prim/sec tracks
           truePartID.type = caf::TrueParticleID::kPrimary;
@@ -175,11 +171,11 @@ namespace cafmaker
       TMSRecoTree->GetEntry(++i); // Load each subsequent entry before loop test condition
       TMSTrueTree->GetEntry(  i); // Load each subsequent entry before loop test condition
       TMSLCTree->GetEntry(  i);
+
     }
   }
 
   // TODO: In future this nastiness will be handled by TMS
-
   std::deque<Trigger> TMSRecoBranchFiller::GetTriggers(int triggerType, bool beamOnly) const
   {
     std::deque<Trigger> triggers;
