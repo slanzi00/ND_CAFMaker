@@ -78,9 +78,9 @@ namespace cafmaker
     fhicl::Atom<float> trackMatchdThetaY { fhicl::Name("TrackMatchDeltaThetaY"), fhicl::Comment("Maximum angle difference with respect to Y axis [rad]"), .09};
 
     // LAr-TMS track matching criteria (default values based on simulation work Quinton Weyrich)
-    fhicl::Atom<double> sigmaX { fhicl::Name("SigmaX"), fhicl::Comment("Standard deviation of x-distance between projected Pandora reco track to start of TMS and matching TMS reco track [cm]"), 57.004};
-    fhicl::Atom<double> sigmaY { fhicl::Name("SigmaY"), fhicl::Comment("Standard deviation of y-distance between projected Pandora reco track to start of TMS and matching TMS reco track [cm]"), 63.863};
-    fhicl::Atom<bool> singleAngle { fhicl::Name("SingleAngle"), fhicl::Comment("Calculate a single 3D angle between matching tracks (true) or split into x- and y-components"), false};
+    fhicl::Atom<double> sigmaX { fhicl::Name("SigmaX"), fhicl::Comment("Standard deviation of x-distance between projected Pandora reco track to start of TMS and matching TMS reco track [cm]"), 107.317};
+    fhicl::Atom<double> sigmaY { fhicl::Name("SigmaY"), fhicl::Comment("Standard deviation of y-distance between projected Pandora reco track to start of TMS and matching TMS reco track [cm]"), 70.776};
+    fhicl::Atom<bool> singleAngle { fhicl::Name("SingleAnglreme"), fhicl::Comment("Calculate a single 3D angle between matching tracks (true) or split into x- and y-components"), false};
     fhicl::Atom<double> sigmaTh { fhicl::Name("SigmaTheta"), fhicl::Comment("Standard deviation of 3D angle between end of Pandora reco track and start of matching TMS reco track [deg]"), 11.579};
     fhicl::Atom<double> sigmaThX { fhicl::Name("SigmaThetaX"), fhicl::Comment("Standard deviation of angle along x-axis between end of Pandora reco track and start of matching TMS reco track [deg]"), 7.882};
     fhicl::Atom<double> sigmaThY { fhicl::Name("SigmaThetaY"), fhicl::Comment("Standard deviation of angle along y-axis between end of Pandora reco track and start of matching TMS reco track [deg]"), 11.648};
