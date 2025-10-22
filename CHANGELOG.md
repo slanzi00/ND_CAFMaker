@@ -3,6 +3,13 @@
 
 ##### current
 
+##### [v4.8.0] -- 2025-10-22
+* Fill in Pandora reco (PRs [#93](https://github.com/DUNE/ND_CAFMaker/pull/93), [#95](https://github.com/DUNE/ND_CAFMaker/pull/98), [#98](https://github.com/DUNE/ND_CAFMaker/pull/98), [#100](https://github.com/DUNE/ND_CAFMaker/pull/100))
+* Keep up with updates to SPINE reco format ([PR #91](https://github.com/DUNE/ND_CAFMaker/pull/91))
+* Compatibility with MINERvA data (PRs [#96](https://github.com/DUNE/ND_CAFMaker/pull/96), [#99](https://github.com/DUNE/ND_CAFMaker/pull/99))
+* Patches for trigger time filling in 2x2/ND-LAr ([PR #101](https://github.com/DUNE/ND_CAFMaker/pull/101))
+* Fill truth interactions in TMS ([PR #104](https://github.com/DUNE/ND_CAFMaker/pull/104))
+
 ##### [v4.7.0] -- 2024-10-16
 * Add TMS Branch reco with updated StandardRecord format with one entry per spill and trigger logic ([PR #87](https://github.com/DUNE/ND_CAFMaker/pull/87))
 * Add track matching logic for 2x2 reconstructions (Pandora, SPINE to MINERvA) ([PR #86](https://github.com/DUNE/ND_CAFMaker/pull/86))
