@@ -16,7 +16,7 @@ parser.add_argument("files", metavar="<FILE>.caf.root", nargs=2, help="2 files t
 parser.add_argument("-t", "--tree-name",                   help="Name of StandardRecord tree to compare", default="cafTree")
 parser.add_argument("-r", "--rec_tree",                    help="Name of 'rec' tree.  Pass empty string for flat CAFs", default="rec")
 parser.add_argument("-T", "--tolerance",   default=1e-20,  help="Tolerance for float comparison", metavar="TOL", type=float)
-parser.add_argument("-i", "--ignore",  dest="ignore",      help="Regex pattern to ignore",        metavar="PAT", default=False)
+parser.add_argument("-i", "--ignore",  action="append",    help="Regex pattern(s) to ignore (specify each one with a separate instance of '-i')",  metavar="PAT", default=[])
 parser.add_argument("-n", "--nevents", dest="nevents",     help="Number of events to compare",    metavar="NEVT", default=-1, type=int)
 parser.add_argument("-l", "--sr-lib-name",                 help="Name of StandardRecord library dictionary to load", default="libduneanaobj_StandardRecord_dict.so")
 parser.add_argument("-L", '--sr-lib-dir',                  help="Directory(/ies separated by ':') to search for the StandardRecord dictionary library (see --sr-lib-name)")
@@ -36,10 +36,7 @@ from ROOT import TLorentzVector
 import inspect
 import math
 
-if args.ignore:
-    ignorepat = re.compile(args.ignore)
-else:
-    ignorepat = False
+ignore_pats = [re.compile(a) for a in args.ignore]
 
 
 if args.sr_lib_dir:
@@ -129,15 +126,13 @@ for i in range(0, count):
   # print("resA:", resA)
   # print("resB:", resB)
   for key in resB:
-    if ignorepat:
-      if ignorepat.search(key):
-        continue
+    if any(i.search(key) for i in ignore_pats):
+      continue
     if not key in resA:
         print(' ', key, 'in file B not found in file A')
 
   for key in resA:
-    if ignorepat:
-      if ignorepat.search(key):
+    if any(i.search(key) for i in ignore_pats):
         continue
 
     if not key in resB:
