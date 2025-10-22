@@ -7,7 +7,7 @@ elif [ "$1" = "prof" ]; then
 	true
 else
 	echo "Unknown build qualifier: '$1'.  Abort."
-	exit 1
+	return 1 || exit 1
 fi
 
 source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh
