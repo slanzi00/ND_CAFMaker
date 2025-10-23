@@ -3,6 +3,9 @@
 
 ##### current
 
+##### [v4.10.0] -- 2025-10-23
+* Upgrade to `e26` build chain ([PR #108](https://github.com/DUNE/ND_CAFMaker/pull/108))
+
 ##### [v4.9.0] -- 2025-10-22
 * Patches to Pandora reco filling (PRs [#95](https://github.com/DUNE/ND_CAFMaker/pull/98), [#98](https://github.com/DUNE/ND_CAFMaker/pull/98), [#100](https://github.com/DUNE/ND_CAFMaker/pull/100))
 * Compatibility with MINERvA data (PRs [#96](https://github.com/DUNE/ND_CAFMaker/pull/96), [#99](https://github.com/DUNE/ND_CAFMaker/pull/99))
