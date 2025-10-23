@@ -6,8 +6,9 @@ if [ "$1" = "debug" ]; then
 elif [ "$1" = "prof" ]; then
 	true
 else
-	echo "Unknown build qualifier: '$1'.  Abort."
-	return 1 || exit 1
+	echo
+	echo "WARNING: build qualifier was unspecified (options: 'prof' or 'debug').  Assuming 'prof' by default!"
+	echo
 fi
 
 source /cvmfs/dune.opensciencegrid.org/products/dune/setup_dune.sh
