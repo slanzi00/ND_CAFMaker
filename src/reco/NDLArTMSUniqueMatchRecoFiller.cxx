@@ -1,5 +1,7 @@
 #include "NDLArTMSUniqueMatchRecoFiller.h"
 #include <cmath>
+#include <random>
+#include <chrono>
 
 namespace cafmaker
 {
@@ -233,7 +235,11 @@ namespace cafmaker
         caf::TrueParticleID partID = truIDs[idx_max]; // ID of true particle that makes up majority of track
         const auto& matchedPart = FindParticle(sr.mc,partID); // gets the particle object corresponding to the ID
         if (matchedPart != nullptr) {
-          lar_time = matchedPart->time - 1e9*trigger.triggerTime_s - trigger.triggerTime_ns;
+	  unsigned seed	= std::chrono::high_resolution_clock::now().time_since_epoch().count();
+          std::mt19937 engine(seed);
+          std::normal_distribution<double> dist(0.0,10.0);
+          double time_smear = dist(engine);
+          lar_time = matchedPart->time - 1e9*trigger.triggerTime_s - trigger.triggerTime_ns + time_smear; // adds gaussian smear to the true time with std 10 ns
           start_pos = matchedPart->start_pos;
 	  double tms_time = tms_trk.time;
           delta_t = lar_time - tms_time;
