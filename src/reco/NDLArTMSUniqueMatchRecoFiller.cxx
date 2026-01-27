@@ -146,7 +146,7 @@ namespace cafmaker
     }
   }
 
-  void NDLArTMSUniqueMatchRecoFiller::Create_matches(const std::vector<caf::SRNDTrackAssn> possibleMatches) const
+  void NDLArTMSUniqueMatchRecoFiller::Create_matches(std::vector<caf::SRNDTrackAssn> possibleMatches, caf::StandardRecord &sr) const
   {
     std::sort(possibleMatches.begin(),possibleMatches.end(),Track_match_sorter);
 
@@ -186,7 +186,7 @@ namespace cafmaker
     }
   }
 
-  std::vector<caf::SRNDTrackAssn> NDLArTMSUniqueMatchRecoFiller::Compute_match_scores(const caf::SRNDLArInt ixn, const unsigned int n_tracks, const unsigned int ixn_tms, const unsigned int itms, const double lar_z_cutoff, const caf::SRTrack tms_trk) const
+  std::vector<caf::SRNDTrackAssn> NDLArTMSUniqueMatchRecoFiller::Compute_match_scores(const caf::SRNDLArInt ixn, const unsigned int ixn_lar, const unsigned int n_tracks, const unsigned int ixn_tms, const unsigned int itms, const double lar_z_cutoff, const caf::SRTrack tms_trk, caf::StandardRecord &sr, const Trigger &trigger) const
   { // given a TMS track and a LAr interaction, computes the match scores between that TMS track and all LAr tracks in the interaction
     std::vector<caf::SRNDTrackAssn> potentialMatchList;
 
@@ -227,14 +227,15 @@ namespace cafmaker
         // this handles time-based matching - using truth-level particle times for now instead of light in LAr
         // this code is bugged somehow, giving nonsense lar_time values
         // either these truth-level particles have wrong times or the IDs we're inputting into sr.mc.Particle are wrong
-        std::vector<float> tOv = pan_trk.truthOverlap;
-        std::vector<caf::TrueParticleID> truIDs = pan_trk.truth;
+        std::vector<float> tOv = trk.truthOverlap;
+        std::vector<caf::TrueParticleID> truIDs = trk.truth;
         int idx_max = std::distance(tOv.begin(),std::max_element(tOv.begin(),tOv.end()));
         caf::TrueParticleID partID = truIDs[idx_max]; // ID of true particle that makes up majority of track
-        const auto& matchedPart = sr.mc.Particle(partID); // gets the particle object corresponding to the ID
+        const auto& matchedPart = FindParticle(sr.mc,partID); // gets the particle object corresponding to the ID
         if (matchedPart != nullptr) {
           lar_time = matchedPart->time - 1e9*trigger.triggerTime_s - trigger.triggerTime_ns;
           start_pos = matchedPart->start_pos;
+	  double tms_time = tms_trk.time;
           delta_t = lar_time - tms_time;
           matchScore += pow((delta_t-mean_t)/sigma_t,2); // adds the time difference term to the matchScore
         }
@@ -244,16 +245,16 @@ namespace cafmaker
       tmsid.ixn = ixn_tms;
       tmsid.idx = itms;
       caf::SRNDLArID larid;
-      panid.reco = caf::kPandoraNDLAr;
-      panid.ixn = ixn;
-      panid.idx = itrk;
+      larid.reco = caf::kPandoraNDLAr;
+      larid.ixn = ixn_lar;
+      larid.idx = itrk;
 
       caf::SRNDTrackAssn potential_match;
       if (use_time) {
         potential_match.matchType = caf::NDRecoMatchType::kUniqueWithTime;
       }
       else {
-        potential_match.matchType = caf::MatchType::kUniqueNoTime;
+        potential_match.matchType = caf::NDRecoMatchType::kUniqueNoTime;
       }
       potential_match.tmsid = tmsid;
       potential_match.larid = larid;
@@ -262,14 +263,14 @@ namespace cafmaker
       potential_match.angdispl = cos(TMath::Pi()/180.0 * angles[2]);
 
       caf::SRTrack joint_track = potential_match.trk;
-      joint_track.start = pan_trk.start;
+      joint_track.start = trk.start;
       joint_track.end = tms_trk.end;
-      joint_track.dir = pan_trk.dir;
+      joint_track.dir = trk.dir;
       joint_track.enddir = tms_trk.enddir;
 
-      joint_track.time = tms_trk.time; // TODO: once we have LAr time working properly this should be switched to lar_trk.time
+      joint_track.time = tms_trk.time; // TODO: once we have LAr time working properly this should be switched to trk.time
 
-      joint_track.Evis = pan_trk.Evis + tms_trk.Evis;
+      joint_track.Evis = trk.Evis + tms_trk.Evis;
       // TODO: add the rest of the joint_track attributes
       
       potentialMatchList.push_back(potential_match);
@@ -299,7 +300,6 @@ namespace cafmaker
       for (unsigned int itms = 0; itms < n_tms_tracks; itms++)
       {
         caf::SRTrack tms_trk = tms_int.tracks[itms];
-        double tms_time = tms_trk.time; // time the TMS track was created (used for time-based matching)
 
         if (!Consider_TMS_track(tms_trk,tms_z_cutoff)) {
           continue; // skips the TMS track if it isn't suitable according to the function
@@ -310,7 +310,7 @@ namespace cafmaker
           caf::SRNDLArInt pan_int = sr.nd.lar.pandora[ixn_pan];
           unsigned int n_pan_tracks = pan_int.ntracks;
           
-          std::vector<caf::SRNDTrackAssn> panTrkAssns = Compute_match_scores(pan_int, n_pan_tracks, ixn_tms, itms, lar_z_cutoff, tms_trk);
+          std::vector<caf::SRNDTrackAssn> panTrkAssns = Compute_match_scores(pan_int, ixn_pan, n_pan_tracks, ixn_tms, itms, lar_z_cutoff, tms_trk, sr, trigger);
 
           copy(panTrkAssns.begin(), panTrkAssns.end(), back_inserter(possiblePandoraMatches));
         }
@@ -320,18 +320,18 @@ namespace cafmaker
           caf::SRNDLArInt dlp_int = sr.nd.lar.dlp[ixn_dlp];
           unsigned int n_dlp_tracks = dlp_int.ntracks;
 
-          std::vector<caf::SRNDTrackAssn> dlpTrkAssns = Compute_match_scores(dlp_int, n_dlp_tracks, ixn_tms, itms, lar_z_cutoff, tms_trk);
+          std::vector<caf::SRNDTrackAssn> dlpTrkAssns = Compute_match_scores(dlp_int, ixn_dlp, n_dlp_tracks, ixn_tms, itms, lar_z_cutoff, tms_trk, sr, trigger);
 
           copy(dlpTrkAssns.begin(), dlpTrkAssns.end(), back_inserter(possibleSPINEMatches));
         }
       }
     }
     if (possiblePandoraMatches.size() > 0) {
-      Create_matches(possiblePandoraMatches);
+      Create_matches(possiblePandoraMatches,sr);
       }
 
     if (possibleSPINEMatches.size() > 0) {
-      Create_matches(possibleSPINEMatches);
+      Create_matches(possibleSPINEMatches,sr);
       }
   }
   // todo: this is a placeholder

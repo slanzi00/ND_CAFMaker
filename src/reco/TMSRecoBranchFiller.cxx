@@ -147,7 +147,7 @@ namespace cafmaker
           interaction.tracks[total+j].dir     = caf::SRVector3D(_TrackStartDirection[j][0], _TrackStartDirection[j][1] , _TrackStartDirection[j][2]);
           interaction.tracks[total+j].enddir  = caf::SRVector3D(_TrackEndDirection[j][0], _TrackEndDirection[j][1] , _TrackEndDirection[j][2]);
 
-          interaction.tracks[total+j].time    = _TMSStartTime; //Adds time of interaction
+          interaction.tracks[total+j].time    = _TMSStartTime[j]; //Adds time of interaction
 
           // Track info
           //interaction.tracks[total+j].len_cm    = tmpLength_cm; //trackVec->Mag(); // TODO: Coming Soon™

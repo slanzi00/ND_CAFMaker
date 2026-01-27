@@ -12,6 +12,7 @@
 
 #include "duneanaobj/StandardRecord/StandardRecord.h"
 #include "duneanaobj/StandardRecord/SRTruthBranch.h"
+#include "duneanaobj/StandardRecord/Navigate.h"
 #include "TMath.h"
 
 namespace cafmaker
@@ -30,6 +31,10 @@ namespace cafmaker
       bool Consider_TMS_track(const caf::SRTrack tms_track, const double tms_z_cutoff) const;
 
       bool Consider_LAr_track(const caf::SRTrack lar_track, const double lar_z_cutoff) const;
+
+      void Create_matches(std::vector<caf::SRNDTrackAssn> possibleMatches, caf::StandardRecord &sr) const;
+
+      std::vector<caf::SRNDTrackAssn> Compute_match_scores(const caf::SRNDLArInt ixn, const unsigned int ixn_lar, const unsigned int n_tracks, const unsigned int ixn_tms, const unsigned int itms, const double lar_z_cutoff, const caf::SRTrack tms_trk, caf::StandardRecord &sr, const Trigger &trigger) const;
 
       std::deque<Trigger> GetTriggers(int triggerType, bool beamOnly) const override;
 
