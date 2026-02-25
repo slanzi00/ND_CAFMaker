@@ -34,11 +34,46 @@ To add variables and inspect what is set and how, check `src/Params.h`.
 
 
 ## Building
-Once you've set up your environment, it's just a matter of typing 
+
+Once you've set up your environment, configure and build with CMake:
+
 ```
-make
+cmake -S . -B build -DCMAKE_BUILD_TYPE=Debug
+cmake --build build
 ```
-in the `ND_CAFMaker` folder, which goes through and builds the objects, library and single `makeCAF` executable.
+
+The build products are installed under `build/` by default. The `makeCAF` executable will be at `build/bin/makeCAF`.
+
+### CMake build options
+
+| Option | Default | Description |
+|--------|---------|-------------|
+| `ENABLE_TMS` | `ON` | Enable TMS reconstruction branch filler |
+| `ENABLE_TESTEXE` | `OFF` | Build the `testHDF` test executable |
+| `CMAKE_BUILD_TYPE` | — | Set to `Debug` or `Release` (overrides the `-g -O2` defaults) |
+
+Example: disable TMS and build the test executable:
+
+```
+cmake -S . -B build -DENABLE_TMS=OFF -DENABLE_TESTEXE=ON
+cmake --build build
+```
+
+### Installing
+
+To install the library and executables to a custom prefix:
+
+```
+cmake -S . -B build -DCMAKE_INSTALL_PREFIX=/path/to/install
+cmake --build build
+cmake --target install
+```
+
+This will place:
+- `libND_CAFMaker.so` → `<prefix>/lib/`
+- `makeCAF` (and optionally `testHDF`) → `<prefix>/bin/`
+
+If no `CMAKE_INSTALL_PREFIX` is given, the default system prefix (`/usr/local`) is used.
 
 # Running
 There is currently only one main executable, `makeCAF`, which is controlled entirely by the input `fhicl` file. To run with the `fhicl` file that was specified under `Inputs`, do
