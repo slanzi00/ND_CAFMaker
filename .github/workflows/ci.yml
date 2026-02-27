@@ -39,20 +39,23 @@ jobs:
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
             echo "container launch OK"
 
-      - name: Setup UPS environment
+      # UPS products/setup uses &&/|| chains like:
+      #   test "$ss" = csh && alias ...
+      # When ss=sh the first test returns 1 and the && chain exits non-zero.
+      # bash -e treats that as a fatal error and kills the shell immediately.
+      # Interactive singularity shells work because set -e is not active there.
+      # Fix: run bash without -e for the UPS setup phase; check cmake explicitly.
+      - name: Build
         run: |
           apptainer exec \
             --bind /cvmfs \
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
-            bash -ec "
-              # Bootstrap UPS by sourcing larsoft products/setup directly
-              # with prod_db pre-set so it does not need to auto-detect its path.
-              export prod_db=/cvmfs/larsoft.opensciencegrid.org/products
-              source /cvmfs/larsoft.opensciencegrid.org/setup_larsoft.sh
-              echo 'larsoft UPS OK'
-              # Now the UPS shell functions (setup, unsetup, ...) are defined.
+            bash -c "
               cd '${GITHUB_WORKSPACE}'
               source ndcaf_setup.sh prof
               echo 'UPS environment OK'
+              cmake -S . -B build -DCMAKE_BUILD_TYPE=Release || exit \$?
+              cmake --build build -j\$(nproc) || exit \$?
+              echo 'Build OK'
             " 2>&1
