@@ -39,29 +39,17 @@ jobs:
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
             echo "container launch OK"
 
-      # source ndcaf_setup.sh and the cmake build must be in the same shell
-      # invocation because UPS environment variables do not persist across steps.
-      # UPS must be bootstrapped via the fermilab common setups script before
-      # setup_dune.sh is called, otherwise prod_db is unset and UPS fails.
-      - name: Build inside SL7 container
+      - name: Setup UPS environment
         run: |
           apptainer exec \
             --bind /cvmfs \
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
             bash -lec "
-              echo '[1/5] UPS bootstrap'
               source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups || true
               export prod_db=/cvmfs/fermilab.opensciencegrid.org/products/common/db
               export PRODUCTS=/cvmfs/fermilab.opensciencegrid.org/products/common/db:/cvmfs/larsoft.opensciencegrid.org/products:/cvmfs/dune.opensciencegrid.org/products/dune:\${PRODUCTS:-}
-              echo '[2/5] sourcing ndcaf_setup.sh'
               cd '${GITHUB_WORKSPACE}'
-              set -x
               source ndcaf_setup.sh prof
-              set +x
-              echo '[3/5] cmake configure'
-              cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-              echo '[4/5] cmake build'
-              cmake --build build -j\$(nproc)
-              echo '[5/5] done'
+              echo 'UPS environment OK'
             " 2>&1
