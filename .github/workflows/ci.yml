@@ -49,7 +49,7 @@ jobs:
             --bind /cvmfs \
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
-            bash -ec "
+            bash -lec "
               echo '[1/5] UPS bootstrap'
               source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups || true
               echo '[2/5] sourcing ndcaf_setup.sh'
