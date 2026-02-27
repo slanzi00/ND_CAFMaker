@@ -45,10 +45,13 @@ jobs:
             --bind /cvmfs \
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
-            bash -lec "
-              source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups || true
-              export prod_db=/cvmfs/fermilab.opensciencegrid.org/products/common/db
-              export PRODUCTS=/cvmfs/fermilab.opensciencegrid.org/products/common/db:/cvmfs/larsoft.opensciencegrid.org/products:/cvmfs/dune.opensciencegrid.org/products/dune:\${PRODUCTS:-}
+            bash -ec "
+              # Bootstrap UPS by sourcing larsoft products/setup directly
+              # with prod_db pre-set so it does not need to auto-detect its path.
+              export prod_db=/cvmfs/larsoft.opensciencegrid.org/products
+              source /cvmfs/larsoft.opensciencegrid.org/setup_larsoft.sh
+              echo 'larsoft UPS OK'
+              # Now the UPS shell functions (setup, unsetup, ...) are defined.
               cd '${GITHUB_WORKSPACE}'
               source ndcaf_setup.sh prof
               echo 'UPS environment OK'
