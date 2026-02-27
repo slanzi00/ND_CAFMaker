@@ -38,7 +38,7 @@ jobs:
             --bind /cvmfs \
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
-            bash -exc "
+            bash -ec "
               source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups
               cd '${GITHUB_WORKSPACE}'
               source ndcaf_setup.sh prof
