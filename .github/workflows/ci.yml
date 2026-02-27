@@ -21,17 +21,12 @@ jobs:
           sudo apt-get update -qq
           sudo apt-get install -y apptainer
 
-      # Mount the DUNE UPS stack and the OSG Singularity image repository.
-      # larsoft.opensciencegrid.org and oasis.opensciencegrid.org are also
-      # required by setup_dune.sh at runtime.
+      # Mount all CVMFS repos needed by setup_dune.sh and the SL7 container.
+      # fermilab.opensciencegrid.org is required by UPS alongside larsoft.
       - name: Setup CVMFS
         uses: cvmfs-contrib/github-action-cvmfs@v4
         with:
-          cvmfs_repositories: >-
-            dune.opensciencegrid.org,
-            larsoft.opensciencegrid.org,
-            oasis.opensciencegrid.org,
-            singularity.opensciencegrid.org
+          cvmfs_repositories: "dune.opensciencegrid.org,larsoft.opensciencegrid.org,fermilab.opensciencegrid.org,oasis.opensciencegrid.org,singularity.opensciencegrid.org"
 
       # source ndcaf_setup.sh and the cmake build must be in the same shell
       # invocation because UPS environment variables do not persist across steps.
@@ -42,9 +37,12 @@ jobs:
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
             bash -c "
-              set -e
+              set -euo pipefail
               cd '${GITHUB_WORKSPACE}'
-              source ndcaf_setup.sh prof
+              echo '--- sourcing ndcaf_setup.sh ---'
+              source ndcaf_setup.sh prof 2>&1
+              echo '--- configuring cmake ---'
               cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+              echo '--- building ---'
               cmake --build build -j\$(nproc)
             "
