@@ -30,19 +30,16 @@ jobs:
 
       # source ndcaf_setup.sh and the cmake build must be in the same shell
       # invocation because UPS environment variables do not persist across steps.
+      # bash -x traces every command so failures are visible in the log.
       - name: Build inside SL7 container
         run: |
           apptainer exec \
             --bind /cvmfs \
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
-            bash -c "
-              set -euo pipefail
+            bash -exc "
               cd '${GITHUB_WORKSPACE}'
-              echo '--- sourcing ndcaf_setup.sh ---'
-              source ndcaf_setup.sh prof 2>&1
-              echo '--- configuring cmake ---'
+              source ndcaf_setup.sh prof
               cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
-              echo '--- building ---'
               cmake --build build -j\$(nproc)
-            "
+            " 2>&1
