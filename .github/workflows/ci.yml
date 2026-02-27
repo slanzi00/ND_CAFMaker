@@ -22,11 +22,15 @@ jobs:
           sudo apt-get install -y apptainer
 
       # Mount the DUNE UPS stack and the OSG Singularity image repository.
+      # larsoft.opensciencegrid.org and oasis.opensciencegrid.org are also
+      # required by setup_dune.sh at runtime.
       - name: Setup CVMFS
         uses: cvmfs-contrib/github-action-cvmfs@v4
         with:
           cvmfs_repositories: >-
             dune.opensciencegrid.org,
+            larsoft.opensciencegrid.org,
+            oasis.opensciencegrid.org,
             singularity.opensciencegrid.org
 
       # source ndcaf_setup.sh and the cmake build must be in the same shell
