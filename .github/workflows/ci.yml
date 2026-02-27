@@ -28,6 +28,17 @@ jobs:
         with:
           cvmfs_repositories: "dune.opensciencegrid.org,larsoft.opensciencegrid.org,fermilab.opensciencegrid.org,oasis.opensciencegrid.org,singularity.opensciencegrid.org"
 
+      # Sanity-check that the key CVMFS paths and the container image are
+      # accessible before attempting the full build.
+      - name: Verify CVMFS and container
+        run: |
+          ls /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups
+          ls /cvmfs/singularity.opensciencegrid.org/fermilab/
+          apptainer exec \
+            --bind /cvmfs \
+            /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
+            echo "container launch OK"
+
       # source ndcaf_setup.sh and the cmake build must be in the same shell
       # invocation because UPS environment variables do not persist across steps.
       # UPS must be bootstrapped via the fermilab common setups script before
@@ -39,9 +50,14 @@ jobs:
             --bind "${GITHUB_WORKSPACE}:${GITHUB_WORKSPACE}" \
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
             bash -ec "
+              echo '[1/5] UPS bootstrap'
               source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups
+              echo '[2/5] sourcing ndcaf_setup.sh'
               cd '${GITHUB_WORKSPACE}'
               source ndcaf_setup.sh prof
+              echo '[3/5] cmake configure'
               cmake -S . -B build -DCMAKE_BUILD_TYPE=Release
+              echo '[4/5] cmake build'
               cmake --build build -j\$(nproc)
+              echo '[5/5] done'
             " 2>&1
