@@ -52,6 +52,8 @@ jobs:
             bash -lec "
               echo '[1/5] UPS bootstrap'
               source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups || true
+              export prod_db=/cvmfs/fermilab.opensciencegrid.org/products/common/db
+              export PRODUCTS=/cvmfs/fermilab.opensciencegrid.org/products/common/db:/cvmfs/larsoft.opensciencegrid.org/products:/cvmfs/dune.opensciencegrid.org/products/dune:\${PRODUCTS:-}
               echo '[2/5] sourcing ndcaf_setup.sh'
               cd '${GITHUB_WORKSPACE}'
               source ndcaf_setup.sh prof
