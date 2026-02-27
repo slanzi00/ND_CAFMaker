@@ -51,7 +51,7 @@ jobs:
             /cvmfs/singularity.opensciencegrid.org/fermilab/fnal-wn-sl7:latest \
             bash -ec "
               echo '[1/5] UPS bootstrap'
-              source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups
+              source /cvmfs/fermilab.opensciencegrid.org/products/common/etc/setups || true
               echo '[2/5] sourcing ndcaf_setup.sh'
               cd '${GITHUB_WORKSPACE}'
               source ndcaf_setup.sh prof
