@@ -1,4 +1,4 @@
-name: ND_CAFMaker CI
+name: CI
 
 on:
   push:
